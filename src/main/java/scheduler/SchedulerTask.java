@@ -54,6 +54,9 @@ public class SchedulerTask extends TimerTask{
 		launchSpecification.setImageId("ami-cec066ae"); //Amazon Linux 2016.09
 		launchSpecification.setInstanceType("t1.micro");	
 		launchSpecification.withKeyName("fabiom");
+//		launchSpecification.setUserData("Comandos que serão executados no boot inicial do servidor");
+//		Instalar o chef baseado na URL: https://packages.chef.io/stable/el/7/chefdk-0.19.6-1.el7.x86_64.rpm
+//		Criar receita que instale o docker e faça o download da imagem da aplicação dummy
 		
 		// Add the security group to the request.
 		ArrayList<String> securityGroups = new ArrayList<String>();
