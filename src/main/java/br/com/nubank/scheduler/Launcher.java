@@ -1,4 +1,4 @@
-package scheduler;
+package br.com.nubank.scheduler;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package scheduler;
+package br.com.nubank.scheduler;
 
 import java.text.ParseException;
 import java.util.List;
@@ -14,8 +14,8 @@ import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 
-public class Listener {
-	private static Logger logger = Logger.getLogger(Listener.class);
+public class SchedulerListener {
+	private static Logger logger = Logger.getLogger(SchedulerListener.class);
 
 	public static void main(String[] args) throws InterruptedException, JSONException, ParseException {
 		AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
