@@ -111,7 +111,8 @@ public class SchedulerTask extends TimerTask{
 		
 		Iterator<?> it = schedule.getVariables().entrySet().iterator();
 	    while (it.hasNext()) {
-	        Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
+	        @SuppressWarnings("unchecked")
+			Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
 	        String variable = pair.getKey() + "=" + pair.getValue();
 	        userData.append("echo " + variable + " >> /tmp/variables.properties\n");
 	    }
@@ -152,8 +153,7 @@ public class SchedulerTask extends TimerTask{
 		        // Get the requests to monitor
 		        DescribeSpotInstanceRequestsResult describeResult = ec2.describeSpotInstanceRequests(describeRequest);
 
-		        List<SpotInstanceRequest> describeResponses =
-		            describeResult.getSpotInstanceRequests();
+		        List<SpotInstanceRequest> describeResponses = describeResult.getSpotInstanceRequests();
 
 		        // are any requests open?
 		        for (SpotInstanceRequest describeResponse : describeResponses) {
@@ -172,6 +172,7 @@ public class SchedulerTask extends TimerTask{
 		                
 		                Job job = new Job();
 		                job.setInstanceId(describeResponse.getInstanceId());
+		                job.setRequestId(describeResponse.getSpotInstanceRequestId());
 		                job.setSchedule(schedule);
 		                job.setStatus("running");
 		                

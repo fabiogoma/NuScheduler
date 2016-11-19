@@ -2,11 +2,19 @@ package br.com.nubank.pojos;
 
 public class Job {
 	private String InstanceId;
+	private String RequestId;
 	private String Schedule;
 	private String Status;
 	public String getInstanceId() {
 		return InstanceId;
 	}
+	public String getRequestId() {
+		return RequestId;
+	}
+	public void setRequestId(String requestId) {
+		RequestId = requestId;
+	}
+
 	public void setInstanceId(String instanceId) {
 		InstanceId = instanceId;
 	}
