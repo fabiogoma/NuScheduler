@@ -2,18 +2,14 @@ package br.com.nubank.scheduler;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.amazonaws.AmazonServiceException;
@@ -31,9 +27,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
-import br.com.nubank.helpers.ScheduleParser;
 import br.com.nubank.pojos.Job;
-import br.com.nubank.pojos.Scheduler;
 
 public class SchedulerTask extends TimerTask{
 	private static Logger logger = Logger.getLogger(SchedulerTask.class);
@@ -100,23 +94,9 @@ public class SchedulerTask extends TimerTask{
 		StringBuilder userData = new StringBuilder();
 		userData.append("#!/bin/bash\n");
 		
-		ScheduleParser scheduleParser = new ScheduleParser();
-		Scheduler schedule = null;
-		try {
-			schedule = scheduleParser.JsonToObject(this.getPayload());
-		} catch (JSONException ex) {
-			ex.printStackTrace();
-		} catch (ParseException ex) {
-			ex.printStackTrace();
-		}
+		String jsonJob = new JSONObject(this.getPayload()).toString();
 		
-		Iterator<?> it = schedule.getVariables().entrySet().iterator();
-	    while (it.hasNext()) {
-	        @SuppressWarnings("unchecked")
-			Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
-	        String variable = pair.getKey() + "=" + pair.getValue();
-	        userData.append("echo " + variable + " >> /tmp/variables.properties\n");
-	    }
+		userData.append("echo '" + jsonJob + "' >> /tmp/schedule.json\n");
 		
 		// Adding the file script.sh
 		LineIterator lit = null;
