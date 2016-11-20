@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
@@ -54,28 +54,29 @@ public class SchedulerTask extends TimerTask{
 
 	private void launchSpotInstance(){
 		logger.info("Launching new Spot Request");
-		AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
+		
+		AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();	
 		
 		// Create the AmazonEC2 client so we can call various APIs.
-		AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
-
+		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withRegion(System.getenv("REGION")).build();
+		
 		// Initializes a Spot Instance Request
 		RequestSpotInstancesRequest requestRequest = new RequestSpotInstancesRequest();
 
 		// Request 1 x Spot Instance
-		requestRequest.setSpotPrice("0.05");
+		requestRequest.setSpotPrice(System.getenv("AWS_SPOT_PRICE"));
 		requestRequest.setInstanceCount(Integer.valueOf(1));
 		
 		// Setup the specifications of the launch.
 		LaunchSpecification launchSpecification = new LaunchSpecification();
 		launchSpecification.setImageId("ami-cec066ae"); //Amazon Linux 2016.09
-		launchSpecification.setInstanceType("t1.micro");	
-		launchSpecification.withKeyName("fabiom");
+		launchSpecification.setInstanceType("t1.micro");
+		launchSpecification.withKeyName(System.getenv("AWS_ACCESS_NAME"));
 		launchSpecification.setUserData(org.apache.commons.codec.binary.Base64.encodeBase64String(prepareUserData().getBytes()));
 		
 		// Add the security group to the request.
 		ArrayList<String> securityGroups = new ArrayList<String>();
-		securityGroups.add("nu-default-sg");
+		securityGroups.add(System.getenv("AWS_SECURITY_GROUP"));
 		launchSpecification.setSecurityGroups(securityGroups);
 
 		// Add the launch specifications to the request.
@@ -116,9 +117,6 @@ public class SchedulerTask extends TimerTask{
 	        String variable = pair.getKey() + "=" + pair.getValue();
 	        userData.append("echo " + variable + " >> /tmp/variables.properties\n");
 	    }
-		
-	    //It will not be used, remove this line before build a docker image.
-	    //userData.append("echo schedule='" + schedule.getSchedule() + "' >> /etc/profile\n");
 		
 		// Adding the file script.sh
 		LineIterator lit = null;
@@ -178,7 +176,7 @@ public class SchedulerTask extends TimerTask{
 		                
 		                JSONObject jobJson = new JSONObject(job);
 		                
-		        		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_update", jobJson.toString()));
+		        		sqs.sendMessage(new SendMessageRequest(System.getenv("SQS_UPDATE_URL"), jobJson.toString()));
 		        }
 		    }
 		    catch (AmazonServiceException e) {

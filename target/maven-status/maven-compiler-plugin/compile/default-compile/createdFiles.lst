@@ -1,1 +1,6 @@
-scheduler/Listener.class
+br/com/nubank/scheduler/SchedulerTask.class
+br/com/nubank/pojos/Job.class
+br/com/nubank/pojos/Scheduler.class
+br/com/nubank/scheduler/SchedulerListener.class
+br/com/nubank/helpers/ScheduleParser.class
+br/com/nubank/scheduler/Launcher.class
